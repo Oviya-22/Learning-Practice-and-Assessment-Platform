@@ -1,4 +1,5 @@
 -- Learning Practice and Assessment Portal
+
 **DEPLOYMENT LINK**:**https://learning-practice-and-assessment-pl.vercel.app**
 
 A comprehensive web-based Learning Practice and Assessment Portal designed to digitize learning, practice, assessment, and academic management. The platform provides role-based access for administrators, faculty, and students while integrating AI-powered learning assistance, secure assessments, analytics, and gamification to improve learning outcomes.
