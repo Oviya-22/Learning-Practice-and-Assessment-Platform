@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnQuest – AI-Powered Learning, Assessment & Certification Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
+    .glass-panel { background: rgba(18, 24, 38, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); transition: all 0.25s ease; }
+    .glass-card:hover { background: rgba(30, 41, 59, 0.8); border-color: rgba(99, 102, 241, 0.4); transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.2); }
+    .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .gradient-gold { background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Standalone LearnQuest Demo Application
+    function App() {
+      const [role, setRole] = useState('student');
+      const [view, setView] = useState('dashboard');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [aiOpen, setAiOpen] = useState(false);
+      const [proctorWarnings, setProctorWarnings] = useState(0);
+      const [aiMessages, setAiMessages] = useState([
+        { sender: 'ai', text: 'Hello! I am your LearnQuest AI Tutor. Ask me any doubt about React 19, PyTorch, or Algorithms!' }
+      ]);
+      const [aiInput, setAiInput] = useState('');
+
+      const handleAiSend = () => {
+        if (!aiInput.trim()) return;
+        setAiMessages(prev => [...prev, { sender: 'user', text: aiInput }]);
+        const query = aiInput;
+        setAiInput('');
+        setTimeout(() => {
+          setAiMessages(prev => [
+            ...prev, 
+            { sender: 'ai', text: `AI Response to "${query}": React 19 Automatic Batching reduces re-renders by combining state updates across timeouts, promises, and native event handlers.` }
+          ]);
+        }, 800);
+      };
+
+      const triggerConfetti = () => {
+        if (window.confetti) {
+          window.confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        }
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Top Navbar */}
+          <header className="sticky top-0 z-40 glass-panel border-b border-white/10 px-6 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('landing')}>
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-bold text-white shadow-lg">
+                  ✨
+                </div>
+                <div>
+                  <span className="font-extrabold text-lg gradient-text">LearnQuest</span>
+                  <span className="block text-[10px] text-gray-400 uppercase tracking-widest">AI Platform v2.5</span>
+                </div>
+              </div>
+
+              {/* Role Switcher Pill */}
+              <div className="flex items-center bg-white/5 border border-white/10 rounded-xl p-1 text-xs">
+                {['student', 'faculty', 'admin', 'superadmin'].map(r => (
+                  <button
+                    key={r}
+                    onClick={() => { setRole(r); setView('dashboard'); }}
+                    className={`px-3 py-1 rounded-lg font-semibold capitalize transition-all ${
+                      role === r ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setAiOpen(!aiOpen)}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-bold text-xs transition-all shadow-md flex items-center gap-1.5"
+              >
+                🤖 Ask AI Tutor
+              </button>
+            </div>
+          </header>
+
+          {/* Main Layout */}
+          <div className="flex-1 flex">
+            {/* Sidebar */}
+            <aside className="w-64 glass-panel border-r border-white/10 p-4 space-y-4 hidden md:block">
+              <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2">Navigation</div>
+              <nav className="space-y-1 text-xs font-semibold">
+                <button onClick={() => setView('dashboard')} className={`w-full text-left px-3 py-2.5 rounded-xl transition-all ${view === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                  📊 Dashboard Overview
+                </button>
+                <button onClick={() => setView('courses')} className={`w-full text-left px-3 py-2.5 rounded-xl transition-all ${view === 'courses' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                  📚 Course Catalog
+                </button>
+                <button onClick={() => setView('practice')} className={`w-full text-left px-3 py-2.5 rounded-xl transition-all ${view === 'practice' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                  🏋️ Adaptive Practice
+                </button>
+                <button onClick={() => setView('exam')} className={`w-full text-left px-3 py-2.5 rounded-xl transition-all ${view === 'exam' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                  🛡️ Secure Assessment
+                </button>
+                <button onClick={() => setView('certificate')} className={`w-full text-left px-3 py-2.5 rounded-xl transition-all ${view === 'certificate' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                  🏆 Certificates
+                </button>
+              </nav>
+            </aside>
+
+            {/* Content View Area */}
+            <main className="flex-1 p-6 overflow-y-auto">
+              {view === 'dashboard' && (
+                <div className="max-w-5xl mx-auto space-y-6">
+                  <div className="glass-panel p-8 rounded-3xl border border-white/10 bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950/60 shadow-2xl flex justify-between items-center">
+                    <div>
+                      <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase">
+                        {role.toUpperCase()} PORTAL ACTIVE
+                      </span>
+                      <h1 className="text-2xl font-extrabold text-white mt-2">Welcome to LearnQuest</h1>
+                      <p className="text-xs text-gray-300 mt-1">AI-powered education, automated grading & secure exam proctoring</p>
+                    </div>
+                    <div className="text-right font-mono">
+                      <div className="text-3xl font-extrabold text-amber-400">3,450 XP</div>
+                      <span className="text-xs text-gray-400">🔥 14-Day Streak</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-2">
+                      <span className="text-xs text-gray-400 uppercase font-bold">Enrolled Path</span>
+                      <h3 className="font-bold text-white text-base">Modern Full-Stack Engineering</h3>
+                      <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden mt-3">
+                        <div className="h-full bg-indigo-500 w-[60%]"></div>
+                      </div>
+                    </div>
+
+                    <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-2">
+                      <span className="text-xs text-gray-400 uppercase font-bold">Next Assessment</span>
+                      <h3 className="font-bold text-amber-400 text-base">Mid-Term Certification Exam</h3>
+                      <button onClick={() => setView('exam')} className="mt-2 w-full py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs">
+                        Start Exam Simulator
+                      </button>
+                    </div>
+
+                    <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-2">
+                      <span className="text-xs text-gray-400 uppercase font-bold">Verified Diplomas</span>
+                      <h3 className="font-bold text-emerald-400 text-base">4 Certificates Earned</h3>
+                      <button onClick={() => setView('certificate')} className="mt-2 w-full py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+                        View Diploma
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {view === 'courses' && (
+                <div className="max-w-5xl mx-auto space-y-6">
+                  <h2 className="text-2xl font-extrabold text-white">Production Course Catalog</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-3">
+                      <span className="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold">Web Development</span>
+                      <h3 className="font-bold text-lg text-white">Full-Stack Development with React & Node</h3>
+                      <p className="text-xs text-gray-400">Master React 19, Express, PostgreSQL, state management, and cloud deployment.</p>
+                      <button onClick={() => setView('dashboard')} className="w-full py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+                        Open Classroom
+                      </button>
+                    </div>
+
+                    <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-3">
+                      <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold">Artificial Intelligence</span>
+                      <h3 className="font-bold text-lg text-white">Applied Machine Learning & PyTorch</h3>
+                      <p className="text-xs text-gray-400">Train neural networks, transformers, vector DBs, and deploy RAG pipelines.</p>
+                      <button onClick={() => setView('dashboard')} className="w-full py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+                        Open Classroom
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {view === 'practice' && (
+                <div className="max-w-3xl mx-auto glass-panel p-8 rounded-3xl border border-white/10 space-y-6">
+                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                    <h2 className="text-lg font-bold text-white">Adaptive Practice Question</h2>
+                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">+25 XP</span>
+                  </div>
+
+                  <p className="text-sm text-gray-200 leading-relaxed font-semibold">
+                    What is the primary benefit of React 19 Automatic Batching?
+                  </p>
+
+                  <div className="space-y-3 text-xs">
+                    <div onClick={triggerConfetti} className="p-4 rounded-2xl bg-indigo-950/60 border border-indigo-500 text-white font-semibold cursor-pointer">
+                      A. It combines multiple state updates across promises and timeouts into a single re-render. ✓
+                    </div>
+                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 text-gray-400 cursor-pointer">
+                      B. It completely disables asynchronous state updates in React components.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {view === 'exam' && (
+                <div className="max-w-3xl mx-auto glass-panel p-8 rounded-3xl border border-white/10 space-y-6">
+                  <div className="bg-rose-950/80 border border-rose-500/40 p-4 rounded-2xl flex justify-between items-center text-xs">
+                    <span className="font-bold text-rose-300">🛡️ SECURE PROCTORING SIMULATOR ACTIVE</span>
+                    <button onClick={() => setProctorWarnings(p => p + 1)} className="px-3 py-1 rounded bg-rose-500/30 text-rose-200 font-bold">
+                      Simulate Tab Switch (Warnings: {proctorWarnings}/3)
+                    </button>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-white">Full-Stack Engineering Mid-Term Certification Exam</h2>
+                  <p className="text-xs text-gray-300">Question 1 of 20 • Time Remaining: 44:30</p>
+
+                  <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 text-xs text-white">
+                    In Node.js, how does the Event Loop handle non-blocking I/O operations?
+                  </div>
+
+                  <button onClick={() => { triggerConfetti(); setView('certificate'); }} className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs">
+                    Submit Exam & View Official Score Report
+                  </button>
+                </div>
+              )}
+
+              {view === 'certificate' && (
+                <div className="max-w-3xl mx-auto glass-panel p-10 rounded-3xl border-2 border-amber-500/40 text-center space-y-6 bg-gradient-to-b from-slate-950 to-indigo-950/50">
+                  <span className="px-4 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-widest">
+                    Official Certificate of Completion
+                  </span>
+                  <h1 className="text-3xl font-extrabold gradient-gold">LearnQuest Academy</h1>
+                  <p className="text-xs text-gray-400 uppercase">This certifies that</p>
+                  <h2 className="text-2xl font-bold text-white underline decoration-amber-500/50">Alex Rivera</h2>
+                  <p className="text-xs text-gray-300">has successfully passed with Distinction (98%)</p>
+                  <h3 className="text-lg font-bold text-indigo-300">Data Structures, Algorithms & LeetCode Masterclass</h3>
+                  <div className="pt-6 border-t border-white/10 flex justify-between text-xs text-gray-400 font-mono">
+                    <span>ID: CERT-LQ-2026-9812</span>
+                    <span className="text-emerald-400">Blockchain Verified ✓</span>
+                  </div>
+                </div>
+              )}
+            </main>
+          </div>
+
+          {/* AI Drawer Modal */}
+          {aiOpen && (
+            <div className="fixed bottom-6 right-6 z-50 w-96 glass-panel rounded-3xl border border-indigo-500/40 p-4 shadow-2xl space-y-3">
+              <div className="flex justify-between items-center border-b border-white/10 pb-2 text-xs font-bold text-white">
+                <span>🤖 LearnQuest AI Assistant</span>
+                <button onClick={() => setAiOpen(false)} className="text-gray-400 hover:text-white">✕</button>
+              </div>
+
+              <div className="h-48 overflow-y-auto space-y-2 text-xs">
+                {aiMessages.map((m, i) => (
+                  <div key={i} className={`p-2.5 rounded-xl ${m.sender === 'user' ? 'bg-indigo-600 text-white ml-auto max-w-[80%]' : 'bg-slate-900 text-gray-200 max-w-[85%]'}`}>
+                    {m.text}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Ask a doubt..."
+                  value={aiInput}
+                  onChange={(e) => setAiInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAiSend()}
+                  className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                />
+                <button onClick={handleAiSend} className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+                  Send
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
